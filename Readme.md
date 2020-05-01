@@ -44,7 +44,18 @@ Least Privilege Access
 ```
 HEADERS
 --------
-<version> <srcaddr> <dstaddr> <srcport> <dstport> <protocol> <packets> <bytes> <start_time> <end_time> <action> <status>
+<version>
+<srcaddr>
+<dstaddr>
+<srcport>
+<dstport>
+<protocol>
+<packets>
+<bytes>
+<start_time>
+<end_time>
+<action>
+<status>
 
 2 172.16.2.145 172.16.2.179 82 64 13 112 441 1557424462 1557424486 REJECT OK
 ```
@@ -94,6 +105,12 @@ HEADERS
 
 Here's the [link](https://go.oracle.com/LP=78019?elqCampaignId=179851) to the process for Cloud Native LA.
 
+## Scope of Tutorial
+
+- This tutorial does not help you setup OCI Logging in the tenancy, you will recieve a document from oracle once the tenancy is whitelisted to help setup logging in tenancy.
+- The recommendation as per this architecture is to have a dedicated logging compartment that fetches resources from multiple compartments and populates logs in a single compartment.
+- This reduces the number of Event Rules to be written and number of Function Deployments.
+
 ## Quickstart For Setup On OCI Side
 
 This quickstart assumes you have working understanding of basic principles of OCI around IAM | Networking and you know how to get around the OCI Console. Since Flow Logs contain sensitive network Information,
@@ -103,10 +120,8 @@ This quickstart assumes you have working understanding of basic principles of OC
 - `Burger-Menu` --> `Identity` --> `Compartments | Users | Groups`
 
 1. Create a Compartment `flow-log-compartment`
-2. Create a Group `flow-log-users`
-3. Add `Required User` to group `flow-log-users`
-4. Create a Dynamic Group `flow-log-dg`
-5. Write appropriate IAM Policies at the tenancy level and compartment level.
+2. Create a Dynamic Group `flow-log-dg`
+3. Write appropriate IAM Policies at the tenancy level and compartment level.
 
 ### Create a Dynamic Group
 
@@ -117,21 +132,9 @@ This quickstart assumes you have working understanding of basic principles of OC
 ANY {resource.type = 'fnfunc', resource.compartment.id = [flow-log-compartment OCID]}
 ```
 
-### Create Tenancy IAM policy - Splunk Export Group
+### Create Tenancy IAM policy - Flow Log Dynamic Group
 
-- `Burger-Menu` --> `Identity` --> `Policies`
-- Create an IAM Policy `flow-log-tenancy-policy` with the following policy statements in the `root` compartment
-
-```
-Allow group flow-log-users to read compartments in tenancy
-Allow group flow-log-users to read virtual-network-family in tenancy
-Allow group flow-log-users to use subnets in tenancy
-Allow group flow-log-users to manage flow-log-configs in tenancy
-Allow group flow-log-users to use flow-log-config-attachments in tenancy
-Allow service FaaS to read repos in tenancy
-```
-
-### Create Tenancy IAM policy - Splunk Export Dynamic Group
+This policy is to allow for enriching flow logs with VCN Information and Compartment Information based on the flow log data recieved
 
 - `Burger-Menu` --> `Identity` --> `Policies`
 - Create an IAM Policy `flow-log-dg-tenancy-policy` with the following policy statements in the `root` compartment
@@ -154,8 +157,9 @@ Allow dynamic-group flow-log-dg to use virtual-network-family in compartment flo
 ### Create a VCN, Subnet & Security Lists
 
 - `Burger-Menu` --> `Networking` --> `Virtual Cloud Networks`
-- Use VCN Quick Start to Create a VCN `flow-log-vcn` with Internet.
-- Connectivity Go to Security List and Delete all a `Stateful Ingress Rules` in the `Default Security list` .
+- Use VCN Quick Start to Create a VCN `flow-log-vcn` .
+- Create only a private-subnet `flow-log-private-subnet`
+- Go to Security List and Delete all a `Stateful Ingress Rules` in the `Default Security list` .
 - Go to Default Security List and create a `Stateful Egress Rule` is available in the `Default Security List` to allow egress traffic for
   - `0.0.0.0/0` on port `443` protocol `TCP`
   - `0.0.0.0/0` on port `8088` protocol `TCP`
@@ -201,7 +205,6 @@ Each folder within the repo represents a function , go to each folder and deploy
 cd splunk-export-logs
 cd enrich-flow-logs
 fn --verbose deploy flow-log-app enrich-flow-logs
-
 ```
 
 The Deploy Automatically Triggers an Fn Build and Fn Push to the Container registry repo setup for the functions.
@@ -218,12 +221,10 @@ These environment variables help call other functions. One after the other.
 | enrich-flow-logs | splunk_hec_token   | The Token that is unqiue to that HEC                                                                          | TOKEN                                     |
 | enrich-flow-logs | splunk_index_name  | The index into which you'd like these logs to get aggregated                                                  | main                                      |
 
-## Invoke and Test !
+### Deploy Event Rules
 
-Invoke Once and the loop will stay active as long as the tenancy does continuously pushing events to Splunk .
+Create an Event Rule in the compartment that gets triggered based on Service `Object Storage` on `Object-Create` under the condition that it bears attribute `all_flows`
+![EventRule](media/eventRuleExample.png)
 
-```
-curl --location --request GET '[apigateway-url].us-phoenix-1.oci.customer-oci.com/regions/listregions'
-```
-
-If all is well in papertrail/ oci-function-logs/metrics, proceed.
+Use Event Action to trigger the function
+![EventAction](media/EventActionExample.png)
