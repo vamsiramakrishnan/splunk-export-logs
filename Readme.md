@@ -128,6 +128,8 @@ This quickstart assumes you have working understanding of basic principles of OC
 - `Burger-Menu` --> `Identity` --> `Dynamic Groups`
 - Create a Dynamic Group `flow-log-dg` Instances that meet the criteria defined by any of these rules will be included in the group.
 
+![Dynamic Group](media/dynamicGroup.png)
+
 ```
 ANY {resource.type = 'fnfunc', resource.compartment.id = [flow-log-compartment OCID]}
 ```
@@ -169,13 +171,20 @@ Allow dynamic-group flow-log-dg to use virtual-network-family in compartment flo
 
 - `Burger-Menu` --> `Developer Services` --> `Functions`
 - Create a Function Application `flow-log-app` in the compartment `flow-log-compartment` while selecting `flow-log-vcn` and the `Private Subnet`
+
+![FnApplication](media/createFnApplication.png)
+
 - Setup Papertrail / OCI Logging Service to debug Function executions if required. [Setup PaperTrail](https://papertrailapp.com/) , check them out.
 
 ### Create a OCIR Repo
 
+![OCIR Repo](media/ocirRepoConfig.png)
+
 - Create a `Private` Repository `flow-log-repo`
 
 ### Configure Cloud Shell
+
+![Cloud Shell](media/cloudShell.png)
 
 15. Setup Cloud Shell in your tenancy - [Link](https://docs.cloud.oracle.com/en-us/iaas/Content/API/Concepts/cloudshellgettingstarted.htm?TocPath=Developer%20Tools%20%7C%7CUsing%20Cloud%20Shell%7C_____0)
 16. Clone the Repo in the cloud shell
@@ -213,13 +222,13 @@ The Deploy Automatically Triggers an Fn Build and Fn Push to the Container regis
 
 These environment variables help call other functions. One after the other.
 
-| Fn-Name          | Parameter Name     | Description                                                                                                   | Example                                   |
-| ---------------- | ------------------ | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| enrich-flow-logs | source_source_name | The Source Name that you would like Splunk to see                                                             | oci-hec-event-collector                   |
-| enrich-flow-logs | source_host_name   | The Source Hostname that you would like Splunk to see                                                         | oci-vcn-flow-logs                         |
-| enrich-flow-logs | splunk_url         | The Splunk Cloud URL ( Append input to the beginning of your splunk cloud url, do not add any http/https etc. | input-prd-p-hh6835czm4rp.cloud.splunk.com |
-| enrich-flow-logs | splunk_hec_token   | The Token that is unqiue to that HEC                                                                          | TOKEN                                     |
-| enrich-flow-logs | splunk_index_name  | The index into which you'd like these logs to get aggregated                                                  | main                                      |
+| Fn-Name          | Parameter Name     | Description                                                                                               | Example                                   |
+| ---------------- | ------------------ | --------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| enrich-flow-logs | source_source_name | The Source Name that you would like Splunk to see                                                         | oci-hec-event-collector                   |
+| enrich-flow-logs | source_host_name   | Source Hostname that you would like Splunk to see                                                         | oci-vcn-flow-logs                         |
+| enrich-flow-logs | splunk_url         | Splunk Cloud URL ( Append input to the beginning of your splunk cloud url, do not add any http/https etc. | input-prd-p-hh6835czm4rp.cloud.splunk.com |
+| enrich-flow-logs | splunk_hec_token   | The Token that is unqiue to that HEC                                                                      | TOKEN                                     |
+| enrich-flow-logs | splunk_index_name  | The index into which you'd like these logs to get aggregated                                              | main                                      |
 
 ### Deploy Event Rules
 
