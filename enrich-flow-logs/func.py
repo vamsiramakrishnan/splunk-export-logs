@@ -19,7 +19,7 @@ def handler(ctx, data: io.BytesIO = None):
         token=os.environ["splunk_hec_token"],
         host=os.environ["source_host_name"],
         input_type="json",
-        http_event_port="8088",
+        http_event_port=os.environ["splunk_hec_port"],
         http_event_server=os.environ["splunk_url"],
     )
     oci_audit_events_JSON.SSL_verify = False
@@ -56,8 +56,7 @@ def read_from_objectStorage(signer, incomingBody):
     resourceName =  incomingBody['data']['resourceName']
     compartmentId =  incomingBody['data']['compartmentId']
 
-
-    
+ 
     #Read Object from event and fetch VNIC, Subnet Metadata
     obj = objectStorageClient.get_object(namespace, bucketName , resourceName)
     obj_headers = oci.util.to_dict(obj.headers)
@@ -81,12 +80,22 @@ def read_from_objectStorage(signer, incomingBody):
     securityListNames = [oci.util.to_dict(vcn_client.get_security_list(securityListId).data)['display_name'] for securityListId in securityListIds]
     
     # Get VNIC Name
-    vnicId = oci.util.to_dict(vcn_client.get_vnic(vnicId).data)
+    vnicId = oci.util.to_dict(vcn_client.get_vnic(vnicId).data)['id']
     vnicName = vnicId['display_name']
     
     #Get NSG Information
     nsgIds = vnicId['nsg_ids']
     nsgNames = [oci.util.to_dict(vcn_client.get_vcn(nsgId).data)['display_name'] for nsgId in nsgIds]
+    
+    publicIps =[]
+    
+    # List Public & Private IPs in Subnet
+    publicIps.extend(oci.util.to_dict(vcn_client.list_public_ips(scope='REGION', lifetime ='RESERVED', compartment_id = subnetCompartmentId).data))
+    publicIps.extend(oci.util.to_dict(vcn_client.list_public_ips(scope='REGION', lifetime ='EPHERMERAL', compartment_id = subnetCompartmentId).data))
+    publicIps.extend(oci.util.to_dict(vcn_client.list_public_ips(scope='AVAILABILITY_DOMAIN ', availability_domain = availabilityDomain lifetime ='EPHEMERAL', compartment_id = subnetCompartmentId).data))
+    
+    privateIps = oci.util.to_dict(vcn_client.list_private_ips().data)
+    
     
     fileName = resourceName.split('/')[1]+ "_" + resourceName.split('/')[2]
     stream = zlib.decompressobj(32 + zlib.MAX_WBITS)  # offset 32 to skip the header
