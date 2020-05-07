@@ -2,6 +2,33 @@
 
 ![](media/DataFlowArchitecture.png)
 
+## Table Of Contents
+
+- [Splunk-Export-Flow-Logs](#splunk-export-flow-logs)
+  - [Table Of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Design Goals](#design-goals)
+  - [Components](#components)
+  - [Other Concepts](#other-concepts)
+  - [Flow Log Enrichment Functionality](#flow-log-enrichment-functionality)
+  - [Setup a Splunk Trial for Testing](#setup-a-splunk-trial-for-testing)
+  - [Pre-requisites](#pre-requisites)
+  - [Scope of Tutorial](#scope-of-tutorial)
+  - [Quickstart For Setup On OCI Side](#quickstart-for-setup-on-oci-side)
+    - [Create Compartments and Groups](#create-compartments-and-groups)
+    - [Create a Dynamic Group](#create-a-dynamic-group)
+    - [Create Tenancy IAM policy - Flow Log Dynamic Group](#create-tenancy-iam-policy---flow-log-dynamic-group)
+    - [Create Compartment Level IAM Policy](#create-compartment-level-iam-policy)
+    - [Create a VCN, Subnet & Security Lists](#create-a-vcn-subnet--security-lists)
+    - [Configure Cloud Shell](#configure-cloud-shell)
+    - [The Cloud Shell](#the-cloud-shell)
+    - [Create a Function Application](#create-a-function-application)
+    - [Getting Started with Fn Deployment](#getting-started-with-fn-deployment)
+    - [Step-8](#step-8)
+    - [Deploy the Functions](#deploy-the-functions)
+    - [Set the Environment Variables for Each Function](#set-the-environment-variables-for-each-function)
+    - [Deploy Event Rules](#deploy-event-rules)
+
 ## Introduction
 
 The Flow Logs of a VCN is central to any kind of debugging in the network and proves to be an extremely useful tool in understanding traffic flow patterns in the context of security as well.
@@ -230,6 +257,7 @@ These environment variables help call other functions. One after the other.
 | enrich-flow-logs | splunk_url         | Splunk Cloud URL ( Append input to the beginning of your splunk cloud url, do not add any http/https etc. | input-prd-p-hh6835czm4rp.cloud.splunk.com |
 | enrich-flow-logs | splunk_hec_token   | The Token that is unqiue to that HEC                                                                      | TOKEN                                     |
 | enrich-flow-logs | splunk_index_name  | The index into which you'd like these logs to get aggregated                                              | main                                      |
+| enrich-flow-logs | splunk_hec_port    | The listener port of the HEC Endpoint of Splunk                                                           | 8088                                      |
 
 ### Deploy Event Rules
 
