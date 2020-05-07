@@ -167,18 +167,16 @@ Allow dynamic-group flow-log-dg to use virtual-network-family in compartment flo
   - `0.0.0.0/0` on port `8088` protocol `TCP`
   - `0.0.0.0/0` on port `53` protocol `UDP`
 
-
-
 ### Configure Cloud Shell
 
 ![Cloud Shell](media/cloudShell.png)
 
 Setup Cloud Shell in your tenancy - [Link](https://docs.cloud.oracle.com/en-us/iaas/Content/API/Concepts/cloudshellgettingstarted.htm?TocPath=Developer%20Tools%20%7C%7CUsing%20Cloud%20Shell%7C_____0)
 
-### About Cloud Shell
-CloudShell is pre-integrated/authenticated with Functions now so you don’t need to set up the following steps … We provide a default fn context with a cloud shell-specific provider for each region now .. See this blog for detail 
+### The Cloud Shell
 
-https://blogs.oracle.com/cloud-infrastructure/oracle-functions-announcing-samples-repository-and-quick-start-with-cloud-shell
+- Oracle Cloud Infrastructure Cloud (OCI) Shell is a web browser-based terminal accessible from the Oracle Cloud Console.
+- Cloud Shell provides access to a Linux shell, with a pre-authenticated Oracle Cloud Infrastructure CLI, a pre-authenticated Functions, Ansible installation, and other useful tools for following Oracle Cloud Infrastructure service tutorials and labs.
 
 ### Create a Function Application
 
@@ -193,20 +191,21 @@ If you are not an IAM Policy Expert, just create these policies as shown in the 
 - Setup Papertrail / OCI Logging Service to debug Function executions if required. [Setup PaperTrail](https://papertrailapp.com/) , check them out.
 
 ### Getting Started with Fn Deployment
-Click on the Getting started Icon after Function Application Creation is done. 
+
+Click on the Getting started Icon after Function Application Creation is done.
 
 ![Getting Started](media/fn-getting-Started.png)
 
-Follow the steps on the screen for simplified Fn Deployment. While you have the option of local Fn Development environment, I'd recommend using the cloud shell if you simply want to deploy Functions. 
+Follow the steps on the screen for simplified Fn Deployment. While you have the option of local Fn Development environment, I'd recommend using the cloud shell if you simply want to deploy Functions.
 
 Follow the steps until **Step-7**
 
 ### Step-8
+
 Instead of creating a new fn we are deploying an existing function. So clone
 
 Clone the Repo in the cloud shell
-    `git clone https://github.com/vamsiramakrishnan/splunk-export-logs.git`
-
+`git clone https://github.com/vamsiramakrishnan/splunk-export-logs.git`
 
 ### Deploy the Functions
 
